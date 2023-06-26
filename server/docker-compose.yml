@@ -1,0 +1,17 @@
+version: "3.2"
+services:
+  rabbitmq:
+    image: rabbitmq:3.12.0
+    container_name: 'rabbitmq'
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - ./rabbitmq/data/:/var/lib/rabbitmq/
+      - ./rabbitmq/log/:/var/log/rabbitmq
+    networks:
+      - rabbit-distributor
+
+networks:
+  rabbit-distributor:
+    driver: bridge
