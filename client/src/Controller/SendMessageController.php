@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Message;
 use App\Form\MessageType;
+use App\Util\RpcClient;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,7 +14,6 @@ class SendMessageController extends AbstractController {
 
     #[Route('/send', name: 'send_message', methods: ['POST'])]
     public function send(Request $request): Response {
-
         $message = new Message();
         $data = json_decode($request->getContent(), true);
 
@@ -22,13 +22,13 @@ class SendMessageController extends AbstractController {
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            return new Response(
-                'Your message is: '. $message->getMessage()
-            );
+            // Send message to Rabbit server
+            $rpcClient = new RpcClient();
+            $response = $rpcClient->call($message->getMessage());
+
+            return new Response('Your response is: '. $response);
         }
 
-        return new Response(
-            'Please provide a message'
-        );
+        return new Response('Please provide a message in body', Response::HTTP_BAD_REQUEST);
     }
 }
