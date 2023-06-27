@@ -1,7 +1,7 @@
-import { rabbitHost, rabbitPort, rabbitPassword, rabbitUser } from './config/index.js'
+import { rabbitHost, rabbitPort, rabbitPassword, rabbitUser, rabbitExchange, rabbitRoutingKey } from './config/index.js'
 import RpcServer from './utils/rpcServer.js'
 
-const amqpConnection = new RpcServer()
+const amqpConnection = new RpcServer(rabbitRoutingKey, rabbitExchange)
 await amqpConnection.connect(rabbitHost, rabbitPort, rabbitUser, rabbitPassword)
 
 amqpConnection.channel.consume(amqpConnection.queue, function reply (msg) {
@@ -9,7 +9,7 @@ amqpConnection.channel.consume(amqpConnection.queue, function reply (msg) {
   console.log(' [.] ' + message)
 
   amqpConnection.channel.sendToQueue(msg.properties.replyTo,
-    Buffer.from(message.toString() + ' -> Antwort'), { correlationId: msg.properties.correlationId })
+    Buffer.from(message.toString() + ' -> Antwort2'), { correlationId: msg.properties.correlationId })
 
   amqpConnection.channel.ack(msg)
 })
