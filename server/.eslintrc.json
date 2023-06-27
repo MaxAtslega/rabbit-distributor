@@ -13,7 +13,6 @@
         "semi": ["error", "never"],
         "no-var": "error",
         "no-multiple-empty-lines": "error",
-        "no-multi-spaces": "error",
-        "no-console": "error"
+        "no-multi-spaces": "error"
     }
 }
