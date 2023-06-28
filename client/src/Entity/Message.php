@@ -2,9 +2,15 @@
 
 namespace App\Entity;
 
+use Symfony\Component\Validator\Constraints as Assert;
+
 class Message {
+
+    #[Assert\NotBlank]
     protected string $message;
-    protected string $routingKey;
+
+    #[Assert\NotBlank]
+    protected string $routing_key;
 
     /**
      * @return string
@@ -27,7 +33,7 @@ class Message {
      */
     public function getRoutingKey(): string
     {
-        return $this->routingKey;
+        return $this->routing_key;
     }
 
     /**
@@ -35,6 +41,6 @@ class Message {
      */
     public function setRoutingKey(string $routingKey): void
     {
-        $this->routingKey = $routingKey;
+        $this->routing_key = $routingKey;
     }
 }

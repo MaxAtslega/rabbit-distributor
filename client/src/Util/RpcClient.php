@@ -2,26 +2,31 @@
 
 namespace App\Util;
 
+use Exception;
+use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 
 class RpcClient {
-    private $connection;
-    private $channel;
-    private $callback_queue;
-    private $response;
-    private $corr_id;
+    private AMQPStreamConnection $connection;
+    private AMQPChannel $channel;
+    private mixed $callback_queue;
+    private mixed $response;
+    private string $corr_id;
 
-    private $exchange = "rabbit-distributor";
+    private string $exchange = "rabbit-distributor";
 
-    public function __construct()
-    {
-        $this->connection = new AMQPStreamConnection(
-            'localhost',
-            5672,
-            'guest',
-            'guest'
-        );
+    /**
+     * @throws Exception
+     */
+    public function __construct() {
+        $rabbitHost = $_ENV['RABBIT_HOST'] ?? "0.0.0.0";
+        $rabbitPort = $_ENV['RABBIT_PORT'] ?? 5672;
+        $rabbitUser = $_ENV['RABBIT_USER'] ?? "guest";
+        $rabbitPassword = $_ENV['RABBIT_PASSWORD'] ?? "guest";
+        $this->exchange = $_ENV['RABBIT_EXCHANGE'] ?? "rabbit-distributor";
+
+        $this->connection = new AMQPStreamConnection($rabbitHost, $rabbitPort, $rabbitUser, $rabbitPassword);
         $this->channel = $this->connection->channel();
         $this->channel->exchange_declare($this->exchange, 'topic', false, true, false);
 
@@ -46,15 +51,13 @@ class RpcClient {
         );
     }
 
-    public function onResponse($rep): void
-    {
+    public function onResponse($rep): void {
         if ($rep->get('correlation_id') == $this->corr_id) {
             $this->response = $rep->body;
         }
     }
 
-    public function call($n, $routing_key): string
-    {
+    public function call($n, $routing_key): string {
         $this->response = null;
         $this->corr_id = uniqid();
 
