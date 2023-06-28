@@ -12,6 +12,8 @@ class RpcClient {
     private $response;
     private $corr_id;
 
+    private $exchange = "rabbit-distributor";
+
     public function __construct()
     {
         $this->connection = new AMQPStreamConnection(
@@ -21,6 +23,8 @@ class RpcClient {
             'guest'
         );
         $this->channel = $this->connection->channel();
+        $this->channel->exchange_declare($this->exchange, 'topic', false, true, false);
+
         list($this->callback_queue, ,) = $this->channel->queue_declare(
             "",
             false,
@@ -49,7 +53,7 @@ class RpcClient {
         }
     }
 
-    public function call($n): string
+    public function call($n, $routing_key): string
     {
         $this->response = null;
         $this->corr_id = uniqid();
@@ -61,7 +65,7 @@ class RpcClient {
                 'reply_to' => $this->callback_queue
             )
         );
-        $this->channel->basic_publish($msg, '', 'rpc_queue');
+        $this->channel->basic_publish($msg, $this->exchange, $routing_key, false, false);
         while (!$this->response) {
             $this->channel->wait();
         }

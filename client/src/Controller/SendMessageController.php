@@ -24,7 +24,7 @@ class SendMessageController extends AbstractController {
 
             // Send message to Rabbit server
             $rpcClient = new RpcClient();
-            $response = $rpcClient->call($message->getMessage());
+            $response = $rpcClient->call($message->getMessage(), $message->getRoutingKey());
 
             return new Response('Your response is: '. $response);
         }

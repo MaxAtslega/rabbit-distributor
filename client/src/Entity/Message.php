@@ -4,6 +4,7 @@ namespace App\Entity;
 
 class Message {
     protected string $message;
+    protected string $routingKey;
 
     /**
      * @return string
@@ -21,5 +22,19 @@ class Message {
         $this->message = $message;
     }
 
+    /**
+     * @return string
+     */
+    public function getRoutingKey(): string
+    {
+        return $this->routingKey;
+    }
 
+    /**
+     * @param string $routingKey
+     */
+    public function setRoutingKey(string $routingKey): void
+    {
+        $this->routingKey = $routingKey;
+    }
 }
