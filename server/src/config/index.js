@@ -10,4 +10,4 @@ export const rabbitUser = RABBIT_USER || 'guest'
 export const rabbitPassword = RABBIT_PASSWORD || 'guest'
 
 export const rabbitExchange = RABBIT_EXCHANGE || 'rabbit-distribute'
-export const rabbitRoutingKey = RABBIT_ROUTING_KEY || 'routing1'
+export const rabbitRoutingKey = RABBIT_ROUTING_KEY || ''

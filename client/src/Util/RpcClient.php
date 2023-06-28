@@ -23,7 +23,7 @@ class RpcClient {
             'guest'
         );
         $this->channel = $this->connection->channel();
-        $this->channel->exchange_declare($this->exchange, 'topic', false, false, false);
+        $this->channel->exchange_declare($this->exchange, 'topic', false, true, false);
 
         list($this->callback_queue, ,) = $this->channel->queue_declare(
             "",
