@@ -12,10 +12,12 @@ export default class RpcServer {
     this._channel = await this._connection.createChannel()
     this._channel.assertExchange(this._exchange, 'topic', { durable: true })
 
+    // Create queues
     this._channel.assertQueue('image', { durable: true })
     this._channel.assertQueue('audio', { durable: true })
     this._channel.assertQueue('video', { durable: true })
 
+    // Bind the queues to this channel
     this._channel.bindQueue(this._channel.queue, this._exchange, 'image')
     this._channel.bindQueue(this._channel.queue, this._exchange, 'audio')
     this._channel.bindQueue(this._channel.queue, this._exchange, 'video')
