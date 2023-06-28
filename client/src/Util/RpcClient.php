@@ -20,12 +20,13 @@ class RpcClient {
      * @throws Exception
      */
     public function __construct() {
-        $this->connection = new AMQPStreamConnection(
-            'localhost',
-            5672,
-            'guest',
-            'guest'
-        );
+        $rabbitHost = $_ENV['RABBIT_HOST'];
+        $rabbitPort = $_ENV['RABBIT_PORT'];
+        $rabbitUser = $_ENV['RABBIT_USER'];
+        $rabbitPassword = $_ENV['RABBIT_PASSWORD'];
+        $this->exchange = $_ENV['RABBIT_EXCHANGE'];
+
+        $this->connection = new AMQPStreamConnection($rabbitHost, $rabbitPort, $rabbitUser, $rabbitPassword);
         $this->channel = $this->connection->channel();
         $this->channel->exchange_declare($this->exchange, 'topic', false, true, false);
 
