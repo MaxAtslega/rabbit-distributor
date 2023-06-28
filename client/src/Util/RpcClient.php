@@ -2,20 +2,24 @@
 
 namespace App\Util;
 
+use Exception;
+use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 
 class RpcClient {
-    private $connection;
-    private $channel;
-    private $callback_queue;
-    private $response;
-    private $corr_id;
+    private AMQPStreamConnection $connection;
+    private AMQPChannel $channel;
+    private mixed $callback_queue;
+    private mixed $response;
+    private string $corr_id;
 
-    private $exchange = "rabbit-distributor";
+    private string $exchange = "rabbit-distributor";
 
-    public function __construct()
-    {
+    /**
+     * @throws Exception
+     */
+    public function __construct() {
         $this->connection = new AMQPStreamConnection(
             'localhost',
             5672,
@@ -46,15 +50,13 @@ class RpcClient {
         );
     }
 
-    public function onResponse($rep): void
-    {
+    public function onResponse($rep): void {
         if ($rep->get('correlation_id') == $this->corr_id) {
             $this->response = $rep->body;
         }
     }
 
-    public function call($n, $routing_key): string
-    {
+    public function call($n, $routing_key): string {
         $this->response = null;
         $this->corr_id = uniqid();
 
