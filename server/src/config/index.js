@@ -3,9 +3,13 @@ import fs from 'fs'
 import path from 'path'
 
 async function readConfig () {
-  const data = await fs.readFileSync(path.join(path.resolve(path.dirname('')), 'config.json'))
-  const object = JSON.parse(data)
-  return object
+  try {
+    const data = await fs.readFileSync(path.join(path.resolve(path.dirname('')), 'config.json'))
+    const object = JSON.parse(data)
+    return object
+  } catch (e) {
+    return {}
+  }
 }
 
 const fileConfig = await readConfig()
@@ -20,6 +24,8 @@ export const rabbitUser = RABBIT_USER || 'guest'
 export const rabbitPassword = RABBIT_PASSWORD || 'guest'
 export const rabbitExchange = RABBIT_EXCHANGE || 'rabbit-distribute'
 
+export const jsonConfig = fileConfig
+
 export const getEndpointInformationByRoutingKey = (key) => {
-  return fileConfig?.endpoints[key]
+  return fileConfig?.queues[key]
 }
