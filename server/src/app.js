@@ -1,12 +1,12 @@
-import { rabbitHost, rabbitPort, rabbitPassword, rabbitUser, rabbitExchange, getEndpointInformationByRoutingKey, jsonConfig } from './config/index.js'
+import { rabbitHost, rabbitPort, rabbitPassword, rabbitUser, rabbitExchange, getEndpointInformationByRoutingKey, endpointsConfig } from './config/index.js'
 import RpcServer from './utils/rpcServer.js'
 
-// Initialize AMQP connection
-const amqpConnection = new RpcServer(rabbitExchange)
-await amqpConnection.connect(rabbitHost, rabbitPort, rabbitUser, rabbitPassword)
-
 // Check whether a config exists or not
-if (Object.keys(jsonConfig).length !== 0) {
+if (Object.keys(endpointsConfig).length !== 0) {
+  // Initialize AMQP connection
+  const amqpConnection = new RpcServer(rabbitExchange)
+  await amqpConnection.connect(rabbitHost, rabbitPort, rabbitUser, rabbitPassword)
+
   // Consume messages from the queue
   amqpConnection.channel.consume(amqpConnection.queue, async function reply (msg) {
     const message = msg.content.toString()
@@ -40,6 +40,5 @@ if (Object.keys(jsonConfig).length !== 0) {
     console.log(' [x] Done')
   })
 } else {
-  console.error('Please, provide a config.json with all endpoints for the queues.')
-  process.exit(1)
+  console.error('Please, provide a config/endpoints.json with all endpoints for the queues.')
 }

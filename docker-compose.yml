@@ -11,8 +11,21 @@ services:
       - .docker-conf/rabbitmq/log/:/var/log/rabbitmq
     networks:
       - rabbit-distributor
-      - default
-
+  server:
+    build: './server'
+    restart: always
+    depends_on:
+      - rabbitmq
+    container_name: "rabbit-distributor-server"
+    environment:
+      RABBIT_HOST: rabbitmq
+      RABBIT_PORT: 5672
+      RABBIT_USER: guest
+      RABBIT_PASSWORD: guest
+      RABBIT_EXCHANGE: rabbit-distributor
+      NODE_TLS_REJECT_UNAUTHORIZED: "0"
+    networks:
+      - rabbit-distributor
 networks:
   rabbit-distributor:
     driver: bridge
