@@ -1,4 +1,4 @@
-import { rabbitHost, rabbitPort, rabbitPassword, rabbitUser, rabbitExchange, consumerAddress } from './config/index.js'
+import { rabbitHost, rabbitPort, rabbitPassword, rabbitUser, rabbitExchange, consumerAddress, getEndpointInformationByRoutingKey } from './config/index.js'
 import RpcServer from './utils/rpcServer.js'
 
 // Initialize AMQP connection
@@ -13,22 +13,23 @@ amqpConnection.channel.consume(amqpConnection.queue, async function reply (msg) 
 
   console.log(' [.] [Queue: ' + msg.fields.routingKey + '] [From: ' + msg.properties.replyTo + '] ' + message)
 
+  const endpoint = getEndpointInformationByRoutingKey(routingKey)
+
   // Fetch data from the consumer
-  await fetch(consumerAddress + '/' + routingKey, {
+  await fetch(endpoint.url, {
     headers: {
       Accept: 'application/json',
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      ...endpoint.headers
     },
     method: 'POST',
-    body: JSON.stringify({ message })
+    body: JSON.stringify({ message, ...endpoint.body })
   })
     .then(response => response.json())
     .then(data => { response = data?.message })
     .catch((error) => {
       console.error(error)
     })
-
-  // Todo: Config with custom endpoints and custom headers
 
   // Send the response to the queue
   amqpConnection.channel.sendToQueue(msg.properties.replyTo,
