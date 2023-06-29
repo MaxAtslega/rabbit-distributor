@@ -1,0 +1,25 @@
+{
+  "endpoints": {
+    "audio": {
+      "url": "http://consumer/audio",
+      "headers": {
+        "token": "testToken"
+      },
+      "body": {}
+    },
+    "video": {
+      "url": "http://consumer/video",
+      "headers": {
+        "token": "testToken"
+      },
+      "body": {}
+    },
+    "image": {
+      "url": "http://consumer/image",
+      "headers": {
+        "token": "testToken"
+      },
+      "body": {}
+    }
+  }
+}
