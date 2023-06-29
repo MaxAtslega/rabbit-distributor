@@ -1,21 +1,21 @@
 {
   "queues": {
     "audio": {
-      "url": "http://consumer/audio",
+      "url": "http://nginx-consumer/audio",
       "headers": {
         "token": "testToken"
       },
       "body": {}
     },
     "video": {
-      "url": "http://consumer/video",
+      "url": "http://nginx-consumer/video",
       "headers": {
         "token": "testToken"
       },
       "body": {}
     },
     "image": {
-      "url": "http://consumer/image",
+      "url": "http://nginx-consumer/image",
       "headers": {
         "token": "testToken"
       },

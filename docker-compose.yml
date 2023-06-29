@@ -1,11 +1,11 @@
-version: "3.2"
+version: "3.4"
 services:
   rabbitmq:
     image: rabbitmq:3.12.0
-    container_name: 'rabbitmq'
-    ports:
-      - 5672:5672
-      - 15672:15672
+    container_name: 'rabbit-distributor-rabbitmq'
+    expose:
+      - 5672
+      - 15672
     volumes:
       - .docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
       - .docker-conf/rabbitmq/log/:/var/log/rabbitmq
@@ -24,6 +24,68 @@ services:
       RABBIT_PASSWORD: guest
       RABBIT_EXCHANGE: rabbit-distributor
       NODE_TLS_REJECT_UNAUTHORIZED: "0"
+    volumes:
+      - ./server/config:/app/config/
+    networks:
+      - rabbit-distributor
+  client-php:
+    build:
+      context: ./client/
+      target: app_php
+    restart: unless-stopped
+    container_name: "rabbit-distributor-client-php"
+    environment:
+      APP_ENV: prod
+      RABBIT_HOST: rabbitmq
+      RABBIT_PORT: 5672
+      RABBIT_USER: guest
+      RABBIT_PASSWORD: guest
+      RABBIT_EXCHANGE: rabbit-distributor
+    volumes:
+      - ./client:/var/www/project/:cached
+    networks:
+      - rabbit-distributor
+  client-nginx:
+    build:
+      context: ./client/
+      target: app_nginx
+    restart: unless-stopped
+    depends_on:
+      - client-php
+    container_name: "rabbit-distributor-client-nginx"
+    environment:
+      APP_ENV: prod
+      RABBIT_HOST: rabbitmq
+      RABBIT_PORT: 5672
+      RABBIT_USER: guest
+      RABBIT_PASSWORD: guest
+      RABBIT_EXCHANGE: rabbit-distributor
+    volumes:
+      - ./client:/var/www/project:ro,cached
+    ports:
+      - 10302:80
+    networks:
+      - rabbit-distributor
+  consumer-php:
+    build:
+      context: ./consumer/
+      target: app_php
+    restart: unless-stopped
+    container_name: "rabbit-distributor-consumer-php"
+    volumes:
+      - ./consumer:/var/www/project/:cached
+    networks:
+      - rabbit-distributor
+  nginx-consumer:
+    build:
+      context: ./consumer/
+      target: app_nginx
+    restart: unless-stopped
+    depends_on:
+      - consumer-php
+    container_name: "rabbit-distributor-consumer-nginx"
+    volumes:
+      - ./consumer:/var/www/project:ro,cached
     networks:
       - rabbit-distributor
 networks:
