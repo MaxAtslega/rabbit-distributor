@@ -17,13 +17,8 @@ services:
     depends_on:
       - rabbitmq
     container_name: "rabbit-distributor-server"
-    environment:
-      RABBIT_HOST: rabbitmq
-      RABBIT_PORT: 5672
-      RABBIT_USER: guest
-      RABBIT_PASSWORD: guest
-      RABBIT_EXCHANGE: rabbit-distributor
-      NODE_TLS_REJECT_UNAUTHORIZED: "0"
+    env_file:
+      - .env
     volumes:
       - ./server/config:/app/config/
     networks:
