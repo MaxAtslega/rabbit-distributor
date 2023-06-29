@@ -1,7 +1,5 @@
 import { rabbitHost, rabbitPort, rabbitPassword, rabbitUser, rabbitExchange, consumerAddress } from './config/index.js'
 import RpcServer from './utils/rpcServer.js'
-import axios from 'axios'
-import https from 'https'
 
 // Initialize AMQP connection
 const amqpConnection = new RpcServer(rabbitExchange)
@@ -16,13 +14,21 @@ amqpConnection.channel.consume(amqpConnection.queue, async function reply (msg) 
   console.log(' [.] [Queue: ' + msg.fields.routingKey + '] [From: ' + msg.properties.replyTo + '] ' + message)
 
   // Fetch data from the consumer
-  const httpsAgent = new https.Agent({ rejectUnauthorized: false })
-  await axios
-    .post(consumerAddress + '/' + routingKey, { message }, { httpsAgent })
-    .then((res) => { response = res.data?.message })
+  await fetch(consumerAddress + '/' + routingKey, {
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
+    },
+    method: 'POST',
+    body: JSON.stringify({ message })
+  })
+    .then(response => response.json())
+    .then(data => { response = data?.message })
     .catch((error) => {
       console.error(error)
     })
+
+  // Todo: Config with custom endpoints and custom headers
 
   // Send the response to the queue
   amqpConnection.channel.sendToQueue(msg.properties.replyTo,
