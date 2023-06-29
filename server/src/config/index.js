@@ -2,17 +2,18 @@ import { config } from 'dotenv'
 import fs from 'fs'
 import path from 'path'
 
-async function readConfig () {
+async function readConfig (file) {
   try {
-    const data = await fs.readFileSync(path.join(path.resolve(path.dirname('')), 'config.json'))
+    const data = await fs.readFileSync(path.join(path.resolve(path.dirname('')), file))
     const object = JSON.parse(data)
     return object
   } catch (e) {
+    console.error(e)
     return {}
   }
 }
 
-const fileConfig = await readConfig()
+const endpointsConfig = await readConfig('config/endpoints.json')
 config()
 
 const { CONSUMER_ADDRESS, RABBIT_HOST, RABBIT_PORT, RABBIT_USER, RABBIT_PASSWORD, RABBIT_EXCHANGE } = process.env
@@ -24,8 +25,8 @@ export const rabbitUser = RABBIT_USER || 'guest'
 export const rabbitPassword = RABBIT_PASSWORD || 'guest'
 export const rabbitExchange = RABBIT_EXCHANGE || 'rabbit-distribute'
 
-export const jsonConfig = fileConfig
+export { endpointsConfig }
 
 export const getEndpointInformationByRoutingKey = (key) => {
-  return fileConfig?.queues[key]
+  return endpointsConfig?.queues[key]
 }
