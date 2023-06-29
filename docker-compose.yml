@@ -24,6 +24,8 @@ services:
       RABBIT_PASSWORD: guest
       RABBIT_EXCHANGE: rabbit-distributor
       NODE_TLS_REJECT_UNAUTHORIZED: "0"
+    volumes:
+      - ./server/config:/app/config/
     networks:
       - rabbit-distributor
   client-php:
