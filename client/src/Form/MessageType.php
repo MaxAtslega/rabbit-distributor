@@ -8,7 +8,10 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 final class MessageType extends AbstractType {
     public function buildForm(FormBuilderInterface $builder, array $options): void {
-        $builder->add('message', TextType::class)->add('routing_key', TextType::class);
+        $builder
+            ->add('message', TextType::class)
+            ->add('routing_key', TextType::class)
+        ;
     }
 
 
